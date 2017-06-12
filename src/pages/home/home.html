@@ -1,4 +1,4 @@
-<ion-header [ngClass]="{'alert':currentStallCount>=stallAlertTreshold}">
+<ion-header>
   <ion-navbar>
     <ion-title>Rig status</ion-title>
   </ion-navbar>
@@ -6,27 +6,27 @@
 
 <ion-content>
   
-  <div class="stats-container" *ngIf="balanceHistory.length>0">
+  <div class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
       <div class="display-number large">
         <span class="value">
-          <span *ngIf="balanceHistory.length>1">{{stats.eur|number:'1.2-2'}}</span>
-          <span *ngIf="balanceHistory.length<=1">-.--</span>
+          <span *ngIf="niceHashData.balanceHistory.length>1">{{stats.eur|number:'1.2-2'}}</span>
+          <span *ngIf="niceHashData.balanceHistory.length<=1">-.--</span>
         </span>
         <span class="tag">€/day</span>
       </div>
       <div class="display-number">
         <span class="value">
-          <span *ngIf="balanceHistory.length>1">{{stats.btc|number:'1.8-8'}}</span>
-          <span *ngIf="balanceHistory.length<=1">-.--</span>
+          <span *ngIf="niceHashData.balanceHistory.length>1">{{stats.btc|number:'1.8-8'}}</span>
+          <span *ngIf="niceHashData.balanceHistory.length<=1">-.--</span>
         </span>
         <span class="tag">BTC/day</span>
       </div>
       <div class="display-number small">
-        <span class="value">{{balanceHistory[0].totalAcceptedSpeed|number:'1.8-8'}}</span>
+        <span class="value">{{niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.8-8'}}</span>
         <span class="tag">Accepted speed</span>
       </div>
       <div class="display-number small">
-        <span class="value">{{balanceHistory[0].totalRejectedSpeed/balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}%</span>
+        <span class="value">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}%</span>
         <span class="tag">Rejected percentage</span>
       </div>
   </div>

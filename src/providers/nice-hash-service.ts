@@ -1,18 +1,35 @@
-import { Deferred } from '../utils';
+import { Subject } from 'rxjs/Rx';
+import { Deferred, NiceHashData, Balance } from '../utils';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 @Injectable()
 export class NiceHashService {
 
-  constructor(public http: Http) { }
+  private logTag: string = 'NiceHashService';
+  private updateBalanceTimeout: any = null;
+  
+  public settings: NiceHashData = {
+    address: '1AWjq6HEsZTxmr1bBi3zUq9fqoQF6eYpq8',
+    updateBalanceActive: false,
+    updateBalanceInterval: 30000,
+    maxHistoryLength: 60,
+    balanceHistory: [],
+    updateSubject: new Subject<any>()
+  };
 
-  public getBalanceHistory(): Deferred<Balance[]>{
+  constructor(public http: Http, private localNotifications: LocalNotifications) { 
+    this.startContinuousBalanceUpdate();
+  }
+
+  /*
+  private getBalanceHistory(): Deferred<Balance[]>{
     let dfd = new Deferred<Balance[]>(),
         d = new Date();
     this.http.get(
-        ` https://api.nicehash.com/api?method=stats.provider.ex&addr=1AWjq6HEsZTxmr1bBi3zUq9fqoQF6eYpq8&from=${d.getTime()}`,
+        ` https://api.nicehash.com/api?method=stats.provider.ex&addr=${this.settings.address}&from=${d.getTime()}`,
         {}
       )
         .map(res => res.json())
@@ -30,12 +47,13 @@ export class NiceHashService {
         );
     return dfd;
   }
+  */
 
-  public getCurrentBalance(): Promise<Balance> {
-    // https://api.nicehash.com/api?method=stats.provider&addr=1AWjq6HEsZTxmr1bBi3zUq9fqoQF6eYpq8
+  private getCurrentBalance(): Promise<Balance> {
+    // https://api.nicehash.com/api?method=stats.provider&addr=${this.settings.address}
     return new Promise<Balance>((resolve, reject) => {
       this.http.get(
-        ` https://api.nicehash.com/api?method=stats.provider&addr=1AWjq6HEsZTxmr1bBi3zUq9fqoQF6eYpq8`,
+        ` https://api.nicehash.com/api?method=stats.provider&addr=${this.settings.address}`,
         {}
       )
         .map(res => res.json())
@@ -64,11 +82,48 @@ export class NiceHashService {
     });
   }
 
-}
+  public startContinuousBalanceUpdate() {
+    console.debug(`${this.logTag}: continuousBalanceUpdate`);
+    this.settings.updateBalanceActive = true;
+    this.updateBalance();
+  }
 
-export interface Balance {
-  timestamp: number;
-  btc: number;
-  totalAcceptedSpeed: number;
-  totalRejectedSpeed: number;
+  public stopContinuousBalanceUpdate() {
+    this.settings.updateBalanceActive = false;
+    if (this.updateBalanceTimeout) {
+      window.clearTimeout(this.updateBalanceTimeout);
+      this.updateBalanceTimeout = null;
+    }
+  }
+
+  private updateBalance(): Deferred<any> {
+    console.debug(`${this.logTag}: getBalance`);
+    this.updateBalanceTimeout = null;
+    let dfd = new Deferred<any>();
+    this.getCurrentBalance().then(
+      (cb) => {
+        if (cb && cb.totalAcceptedSpeed <= 0) {
+          this.localNotifications.schedule({
+            id: 1,
+            title: 'Rig Alert',
+            text: 'Mining speed failed to zero!',
+          });
+        }
+        let l = this.settings.balanceHistory.length;
+        if (l == 0 || this.settings.balanceHistory[l - 1].btc != cb.btc)
+          this.settings.balanceHistory.unshift(cb);
+        if (this.settings.balanceHistory.length > this.settings.maxHistoryLength)
+          this.settings.balanceHistory.length = this.settings.maxHistoryLength;
+        this.settings.updateSubject.next(true);
+        dfd.resolve(true);
+      },
+      err => dfd.resolve(false)
+    );
+    dfd.promise.then(r => {
+      if (this.settings.updateBalanceActive && !this.updateBalanceTimeout)
+        this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), this.settings.updateBalanceInterval);
+    });
+    return dfd;
+  }
+
 }

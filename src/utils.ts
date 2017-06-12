@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs/Rx';
 
 export class AppConstants {
   public static LOCALSTORAGE_KEYS = {
@@ -52,6 +53,20 @@ export interface CurrencyRates {
     USD: number;
     ZAR: number;
   };
+}
+export interface Balance {
+  timestamp: number;
+  btc: number;
+  totalAcceptedSpeed: number;
+  totalRejectedSpeed: number;
+}
+export interface NiceHashData {
+  address: string;
+  updateBalanceActive: boolean;
+  updateBalanceInterval: number;
+  maxHistoryLength: number;
+  balanceHistory: Balance[];
+  updateSubject: Subject<any>;
 }
 export function tryToGetItemFromLocalStorage(key: string, parseJson: boolean): any {
   let item;

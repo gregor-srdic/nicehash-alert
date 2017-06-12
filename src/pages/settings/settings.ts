@@ -1,3 +1,4 @@
+import { NiceHashService } from '../../providers/nice-hash-service';
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
@@ -7,7 +8,7 @@ import { NavController } from 'ionic-angular';
 })
 export class SettingsPage {
 
-  constructor(public navCtrl: NavController) {
+  constructor(public navCtrl: NavController, private niceHash:NiceHashService) {
 
   }
 
