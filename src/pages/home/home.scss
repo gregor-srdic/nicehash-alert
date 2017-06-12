@@ -1,0 +1,12 @@
+page-home {
+    .stats-container {
+        max-width: 240px;
+        margin: auto;
+        .display-number {
+            margin: 16px 0;
+            &.large {
+                margin: 32px 0;
+            }
+        }
+    }
+}
