@@ -24,9 +24,9 @@ export class HomePage {
   constructor(public navCtrl: NavController, private niceHash: NiceHashService, private currencyExchange: CurrencyExchangeService) {
     this.niceHashData = this.niceHash.settings;
     this.stats = {
-      btc: 0,
-      usd: 0,
-      eur: 0,
+      btc: null,
+      usd: null,
+      eur: null,
       connection: false
     };
     this.niceHashData.updateSubject.subscribe(next => {
@@ -64,6 +64,11 @@ export class HomePage {
       this.currentBtcPriceInUsd = currentBtcPriceInUsd;
       this.usdExchangeRates = usdExchangeRates;
       let l = this.niceHashData.balanceHistory.length - 1;
+      if(l==0){
+        this.stats.btc = this.niceHashData.profitabilityInBtc;
+        this.stats.usd = this.currentBtcPriceInUsd ? this.niceHashData.profitabilityInBtc * this.currentBtcPriceInUsd : 0;
+        this.stats.eur = this.stats.usd && this.usdExchangeRates && this.usdExchangeRates.rates.EUR ? this.stats.usd * this.usdExchangeRates.rates.EUR : 0;
+      }
       if (l > 0) {
         this.stats.btc = ((this.niceHashData.balanceHistory[0].btc - this.niceHashData.balanceHistory[l].btc) * 24 * 3600 * 1000) / (this.niceHashData.balanceHistory[0].timestamp - this.niceHashData.balanceHistory[l].timestamp);
         this.stats.usd = this.currentBtcPriceInUsd ? this.stats.btc * this.currentBtcPriceInUsd : 0;

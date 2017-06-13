@@ -1,5 +1,5 @@
 import { PromptForAddressModal } from '../pages/modals/prompt-for-address';
-import { Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs/Rx';
 import { AppConstants, Balance, Deferred, NiceHashData, tryToGetItemFromLocalStorage } from '../utils';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
@@ -21,7 +21,9 @@ export class NiceHashService {
     maxHistoryLength: 60,
     balanceHistory: [],
     updateSubject: new Subject<any>(),
-    promptForAddressModal: null
+    promptForAddressModal: null,
+    profitabilityInBtc: 0,
+    updateCountDown: null
   };
 
   constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController) {
@@ -29,33 +31,35 @@ export class NiceHashService {
     this.startContinuousBalanceUpdate();
   }
 
-  /*
-  private getBalanceHistory(): Deferred<Balance[]>{
-    let dfd = new Deferred<Balance[]>(),
-        d = new Date();
+
+  private getProfitability(): Deferred<number> {
+    let dfd = new Deferred<number>(),
+      d = new Date();
+    if (!this.settings.address || this.settings.profitabilityInBtc) {
+      dfd.resolve(this.settings.profitabilityInBtc);
+      return dfd;
+    }
     this.http.get(
-        ` https://api.nicehash.com/api?method=stats.provider.ex&addr=${this.settings.address}&from=${d.getTime()}`,
-        {}
-      )
-        .map(res => res.json())
-        .subscribe(
-        data => {
-          if (data.result && data.result.past) {
-            let balances = []
-            data.result.past.forEach(pastElement => {
-              
-            });
-            dfd.resolve(balances);
-          }
-        },
-        err => dfd.reject(null)
-        );
+      ` https://api.nicehash.com/api?method=stats.provider.ex&addr=${this.settings.address}&from=${d.getTime()}`,
+      {}
+    )
+      .map(res => res.json())
+      .subscribe(
+      data => {
+        if (data.result && data.result.current) {
+          let profitability = 0;
+          data.result.current.forEach(el => profitability += parseFloat(el.profitability));
+          this.settings.profitabilityInBtc = profitability;
+          dfd.resolve(profitability);
+        }
+      },
+      err => dfd.reject(null)
+      );
     return dfd;
   }
-  */
+
 
   private getCurrentBalance(): Promise<Balance> {
-    // https://api.nicehash.com/api?method=stats.provider&addr=${this.settings.address}
     return new Promise<Balance>((resolve, reject) => {
       this.http.get(
         ` https://api.nicehash.com/api?method=stats.provider&addr=${this.settings.address}`,
@@ -90,6 +94,7 @@ export class NiceHashService {
   private updateBalance(): Deferred<any> {
     console.debug(`${this.logTag}: getBalance`);
     this.updateBalanceTimeout = null;
+    this.settings.updateCountDown = null;
     let dfd = new Deferred<any>();
     if (!this.settings.address) {
       dfd.resolve(false);
@@ -119,8 +124,12 @@ export class NiceHashService {
       );
     }
     dfd.promise.then(r => {
-      if (this.settings.updateBalanceActive && !this.updateBalanceTimeout)
-        this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), this.settings.updateBalanceInterval);
+      if (this.settings.updateBalanceActive && !this.updateBalanceTimeout) {
+        let duration = r ? this.settings.updateBalanceInterval : 50000;
+        this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), duration);
+        duration = duration / 1000;
+        this.settings.updateCountDown = Observable.timer(0, 1000).map(value => {console.log(value); return (value * 100) / duration; }).takeWhile(value => value < 100);
+      }
     });
     return dfd;
   }
@@ -137,14 +146,18 @@ export class NiceHashService {
     let settings = {
       address: this.settings.address
     };
-    window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings,JSON.stringify(settings));
+    window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, JSON.stringify(settings));
   }
 
   public startContinuousBalanceUpdate() {
     console.debug(`${this.logTag}: startContinuousBalanceUpdate`);
-    this.settings.updateBalanceActive = true;
-    this.insomnia.keepAwake();
-    this.updateBalance();
+    this.getProfitability().promise.then(
+      profitability => {
+        this.settings.updateBalanceActive = true;
+        this.insomnia.keepAwake();
+        this.updateBalance();
+      }
+    )
   }
 
   public stopContinuousBalanceUpdate() {
@@ -155,13 +168,14 @@ export class NiceHashService {
       window.clearTimeout(this.updateBalanceTimeout);
       this.updateBalanceTimeout = null;
     }
+    this.settings.updateCountDown = null;
   }
 
   private promptForAddress() {
     if (!this.settings.promptForAddressModal) {
       this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, {});
       this.settings.promptForAddressModal.onDidDismiss((address) => {
-        if (address){
+        if (address) {
           this.settings.address = address;
           this.saveSettingsToLocalStorage();
         }

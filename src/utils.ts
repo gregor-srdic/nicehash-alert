@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs/Rx';
+import { Observable, Subject } from 'rxjs/Rx';
 import { Modal } from 'ionic-angular';
 
 export class AppConstants {
@@ -70,6 +70,8 @@ export interface NiceHashData {
   balanceHistory: Balance[];
   updateSubject: Subject<any>;
   promptForAddressModal: Modal;
+  profitabilityInBtc: number;
+  updateCountDown: Observable<number>;
 }
 export interface Stats {
   btc: number;

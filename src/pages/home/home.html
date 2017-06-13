@@ -1,24 +1,17 @@
-<!--
-<ion-header>
-  <ion-navbar>
-    <ion-title>Rig status</ion-title>
-  </ion-navbar>
-</ion-header>
--->
 <ion-content>  
-  <ion-icon *ngIf="!stats.connection" color="danger" name="alert"></ion-icon>
+  <ion-icon color="danger" name="alert"></ion-icon><!--*ngIf="!stats.connection" -->
   <div class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
       <div class="display-number large">
         <span class="value">
-          <span *ngIf="niceHashData.balanceHistory.length>1">{{stats.eur|number:'1.2-2'}}</span>
-          <span *ngIf="niceHashData.balanceHistory.length<=1">-.--</span>
+          <span *ngIf="stats.eur!==null">{{stats.eur|number:'1.2-2'}}</span>
+          <span *ngIf="stats.eur===null">-.--</span>
         </span>
         <span class="tag">€/day</span>
       </div>
       <div class="display-number">
         <span class="value">
-          <span *ngIf="niceHashData.balanceHistory.length>1">{{stats.btc|number:'1.8-8'}}</span>
-          <span *ngIf="niceHashData.balanceHistory.length<=1">-.--</span>
+          <span *ngIf="stats.btc!==null">{{stats.btc|number:'1.8-8'}}</span>
+          <span *ngIf="stats.eur===null">-.--</span>
         </span>
         <span class="tag">BTC/day</span>
       </div>
@@ -29,6 +22,9 @@
       <div class="display-number small">
         <span class="value">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}%</span>
         <span class="tag">Rejected percentage</span>
+      </div>
+      <div class="progress-bar">
+        <div *ngIf="niceHashData.updateCountDown" class="fill" [style.width.%]="niceHashData.updateCountDown | async"></div>
       </div>
   </div>
 
