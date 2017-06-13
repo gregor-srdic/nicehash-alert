@@ -1,26 +1,31 @@
+import { PromptForAddressModal } from '../pages/modals/prompt-for-address';
 import { Subject } from 'rxjs/Rx';
-import { Deferred, NiceHashData, Balance } from '../utils';
+import { AppConstants, Balance, Deferred, NiceHashData, tryToGetItemFromLocalStorage } from '../utils';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { Insomnia } from '@ionic-native/insomnia';
+import { ModalController, Modal } from 'ionic-angular';
 
 @Injectable()
 export class NiceHashService {
 
   private logTag: string = 'NiceHashService';
   private updateBalanceTimeout: any = null;
-  
+
   public settings: NiceHashData = {
-    address: '1AWjq6HEsZTxmr1bBi3zUq9fqoQF6eYpq8',
+    address: '',
     updateBalanceActive: false,
     updateBalanceInterval: 30000,
     maxHistoryLength: 60,
     balanceHistory: [],
-    updateSubject: new Subject<any>()
+    updateSubject: new Subject<any>(),
+    promptForAddressModal: null
   };
 
-  constructor(public http: Http, private localNotifications: LocalNotifications) { 
+  constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController) {
+    this.readSettingsFromLocalStorage();
     this.startContinuousBalanceUpdate();
   }
 
@@ -82,48 +87,87 @@ export class NiceHashService {
     });
   }
 
+  private updateBalance(): Deferred<any> {
+    console.debug(`${this.logTag}: getBalance`);
+    this.updateBalanceTimeout = null;
+    let dfd = new Deferred<any>();
+    if (!this.settings.address) {
+      dfd.resolve(false);
+      this.promptForAddress();
+    } else {
+      this.getCurrentBalance().then(
+        (cb) => {
+          if (cb && cb.totalAcceptedSpeed <= 0) {
+            this.localNotifications.schedule({
+              id: 1,
+              title: 'Rig Alert',
+              text: 'Mining speed failed to zero!',
+            });
+          }
+          let l = this.settings.balanceHistory.length;
+          if (l == 0 || this.settings.balanceHistory[l - 1].btc != cb.btc)
+            this.settings.balanceHistory.unshift(cb);
+          if (this.settings.balanceHistory.length > this.settings.maxHistoryLength)
+            this.settings.balanceHistory.length = this.settings.maxHistoryLength;
+          this.settings.updateSubject.next(true);
+          dfd.resolve(true);
+        },
+        err => {
+          this.settings.updateSubject.next(false);
+          dfd.resolve(false);
+        }
+      );
+    }
+    dfd.promise.then(r => {
+      if (this.settings.updateBalanceActive && !this.updateBalanceTimeout)
+        this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), this.settings.updateBalanceInterval);
+    });
+    return dfd;
+  }
+
+  private readSettingsFromLocalStorage() {
+    let settings = tryToGetItemFromLocalStorage(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, true);
+    if (!settings)
+      return;
+    if (settings.address)
+      this.settings.address = settings.address;
+  }
+
+  private saveSettingsToLocalStorage() {
+    let settings = {
+      address: this.settings.address
+    };
+    window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings,JSON.stringify(settings));
+  }
+
   public startContinuousBalanceUpdate() {
-    console.debug(`${this.logTag}: continuousBalanceUpdate`);
+    console.debug(`${this.logTag}: startContinuousBalanceUpdate`);
     this.settings.updateBalanceActive = true;
+    this.insomnia.keepAwake();
     this.updateBalance();
   }
 
   public stopContinuousBalanceUpdate() {
+    console.debug(`${this.logTag}: stopContinuousBalanceUpdate`);
     this.settings.updateBalanceActive = false;
+    this.insomnia.allowSleepAgain();
     if (this.updateBalanceTimeout) {
       window.clearTimeout(this.updateBalanceTimeout);
       this.updateBalanceTimeout = null;
     }
   }
 
-  private updateBalance(): Deferred<any> {
-    console.debug(`${this.logTag}: getBalance`);
-    this.updateBalanceTimeout = null;
-    let dfd = new Deferred<any>();
-    this.getCurrentBalance().then(
-      (cb) => {
-        if (cb && cb.totalAcceptedSpeed <= 0) {
-          this.localNotifications.schedule({
-            id: 1,
-            title: 'Rig Alert',
-            text: 'Mining speed failed to zero!',
-          });
+  private promptForAddress() {
+    if (!this.settings.promptForAddressModal) {
+      this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, {});
+      this.settings.promptForAddressModal.onDidDismiss((address) => {
+        if (address){
+          this.settings.address = address;
+          this.saveSettingsToLocalStorage();
         }
-        let l = this.settings.balanceHistory.length;
-        if (l == 0 || this.settings.balanceHistory[l - 1].btc != cb.btc)
-          this.settings.balanceHistory.unshift(cb);
-        if (this.settings.balanceHistory.length > this.settings.maxHistoryLength)
-          this.settings.balanceHistory.length = this.settings.maxHistoryLength;
-        this.settings.updateSubject.next(true);
-        dfd.resolve(true);
-      },
-      err => dfd.resolve(false)
-    );
-    dfd.promise.then(r => {
-      if (this.settings.updateBalanceActive && !this.updateBalanceTimeout)
-        this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), this.settings.updateBalanceInterval);
-    });
-    return dfd;
+      })
+      this.settings.promptForAddressModal.present();
+    }
   }
 
 }

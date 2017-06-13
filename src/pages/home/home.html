@@ -1,11 +1,12 @@
+<!--
 <ion-header>
   <ion-navbar>
     <ion-title>Rig status</ion-title>
   </ion-navbar>
 </ion-header>
-
-<ion-content>
-  
+-->
+<ion-content>  
+  <ion-icon *ngIf="!stats.connection" color="danger" name="alert"></ion-icon>
   <div class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
       <div class="display-number large">
         <span class="value">

@@ -1,8 +1,10 @@
 import { Subject } from 'rxjs/Rx';
+import { Modal } from 'ionic-angular';
 
 export class AppConstants {
   public static LOCALSTORAGE_KEYS = {
-    currencyConversionRates: 'currencyConversionRates'
+    currencyConversionRates: 'currencyConversionRates',
+    niceHashSettings: 'niceHashSettings'
   };
 }
 export class Deferred<T> {
@@ -67,6 +69,13 @@ export interface NiceHashData {
   maxHistoryLength: number;
   balanceHistory: Balance[];
   updateSubject: Subject<any>;
+  promptForAddressModal: Modal;
+}
+export interface Stats {
+  btc: number;
+  usd: number;
+  eur: number;
+  connection: boolean;
 }
 export function tryToGetItemFromLocalStorage(key: string, parseJson: boolean): any {
   let item;

@@ -1,0 +1,30 @@
+<!--
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Please enter your NiceHash wallet address</ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss(false)">
+        <svg-icon src="assets/icons/cancel.svg" item-left></svg-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+-->
+
+<ion-content padding>
+    
+    <ion-item>
+        <ion-label color="primary" stacked>Enter Wallet Address</ion-label>
+        <ion-input [(ngModel)]="address" type="text" placeholder="Wallet Address"></ion-input>
+    </ion-item>
+
+    <ion-fab bottom left>
+        <button (click)="openQrScanner()" ion-fab><ion-icon name="qr-scanner"></ion-icon></button>
+    </ion-fab>
+
+    <ion-fab bottom right>
+        <button (click)="dismiss(true)" [disabled]="!address" ion-fab><ion-icon name="checkmark"></ion-icon></button>
+    </ion-fab>
+
+
+</ion-content>

@@ -1,4 +1,4 @@
-import { Balance, CurrencyRates, NiceHashData } from '../../utils';
+import { Balance, CurrencyRates, NiceHashData, Stats } from '../../utils';
 import { CurrencyExchangeService } from '../../providers/currency-exchange-service';
 import { NiceHashService } from '../../providers/nice-hash-service';
 import { Component } from '@angular/core';
@@ -26,9 +26,17 @@ export class HomePage {
     this.stats = {
       btc: 0,
       usd: 0,
-      eur: 0
+      eur: 0,
+      connection: false
     };
-    this.niceHashData.updateSubject.subscribe(next => this.updateStats());
+    this.niceHashData.updateSubject.subscribe(next => {
+      if(next){
+        this.stats.connection = true;
+        this.updateStats();
+      }
+      else
+        this.stats.connection = false;
+    });
   }
   /*
   ionViewWillEnter() {
@@ -65,10 +73,4 @@ export class HomePage {
     });
   }
 
-}
-
-export interface Stats {
-  btc: number;
-  usd: number;
-  eur: number;
 }

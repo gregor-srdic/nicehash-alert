@@ -1,3 +1,4 @@
+import { PromptForAddressModal } from '../pages/modals/prompt-for-address';
 import { HttpModule } from '@angular/http';
 import { NiceHashService } from '../providers/nice-hash-service';
 import { CurrencyExchangeService } from '../providers/currency-exchange-service';
@@ -13,13 +14,16 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { Insomnia } from '@ionic-native/insomnia';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 @NgModule({
   declarations: [
     MyApp,
     SettingsPage,
     HomePage,
-    TabsPage
+    TabsPage,
+    PromptForAddressModal
   ],
   imports: [
     BrowserModule,
@@ -31,12 +35,15 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
     MyApp,
     SettingsPage,
     HomePage,
-    TabsPage
+    TabsPage,
+    PromptForAddressModal
   ],
   providers: [
     StatusBar,
     SplashScreen,
     LocalNotifications,
+    Insomnia,
+    BarcodeScanner,
     NiceHashService,
     CurrencyExchangeService,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
