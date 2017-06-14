@@ -1,31 +1,31 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content pullingText="Pull to refresh" refreshingSpinner="crescent" refreshingText="Updating ...">
+    <ion-refresher-content pullingText="Pull to refresh" refreshingSpinner="crescent" pullingIcon="ios-arrow-down" refreshingText="Updating ...">
     </ion-refresher-content>
   </ion-refresher>
   <ion-icon *ngIf="!stats.connection" color="danger" name="alert"></ion-icon>
   <div class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
     <div class="display-number large">
       <span class="value">
-          <span *ngIf="stats.eur!==null">{{stats.eur|number:'1.2-2'}}</span>
-      <span *ngIf="stats.eur===null">-.--</span>
+        <span *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">{{stats.btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span *ngIf="!currentBtcPriceInUsd||!usdExchangeRates||!usdExchangeRates.rates[niceHashData.currency]">-.--</span>
       </span>
-      <span class="tag">€/day</span>
+      <span class="tag">{{niceHashData.currency}} per day</span>
     </div>
     <div class="display-number">
       <span class="value">
           <span *ngIf="stats.btc!==null">{{stats.btc|number:'1.8-8'}}</span>
-      <span *ngIf="stats.eur===null">-.--</span>
+      <span *ngIf="stats.btc===null">-.--</span>
       </span>
-      <span class="tag">BTC/day</span>
+      <span class="tag">BTC per day</span>
+    </div>
+    <div class="display-number small" *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">
+      <span class="value">{{niceHashData.balanceHistory[0].btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+      <span class="tag">{{niceHashData.currency}} balance</span>
     </div>
     <div class="display-number small">
       <span class="value">{{niceHashData.balanceHistory[0].btc|number:'1.8-8'}}</span>
       <span class="tag">BTC balance</span>
-    </div>
-    <div class="display-number small" *ngIf="this.currentBtcPriceInUsd">
-      <span class="value">{{niceHashData.balanceHistory[0].btc*this.currentBtcPriceInUsd|number:'1.2-2'}}</span>
-      <span class="tag">EUR balance</span>
     </div>
     <!--
     <div class="display-number small">

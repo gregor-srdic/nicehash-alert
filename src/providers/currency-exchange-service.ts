@@ -44,6 +44,7 @@ export class CurrencyExchangeService {
       dateToday = moment().format('YYYY-MM-DD'),
       storedRates: CurrencyRates = tryToGetItemFromLocalStorage(AppConstants.LOCALSTORAGE_KEYS.currencyConversionRates, true);
     if (storedRates && storedRates.retreivedDate == dateToday) {
+      storedRates.rates.USD = 1;
       currencyRatesDfd.resolve(storedRates);
       return currencyRatesDfd;
     }
@@ -53,6 +54,7 @@ export class CurrencyExchangeService {
       data => {
         if (data) {
           data.retreivedDate = dateToday;
+          data.rates.USD = 1;
           currencyRatesDfd.resolve(data);
           window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.currencyConversionRates, JSON.stringify(data));
           return;

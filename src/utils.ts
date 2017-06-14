@@ -77,8 +77,6 @@ export interface NiceHashData {
 }
 export interface Stats {
   btc: number;
-  usd: number;
-  eur: number;
   connection: boolean;
 }
 export function tryToGetItemFromLocalStorage(key: string, parseJson: boolean): any {
