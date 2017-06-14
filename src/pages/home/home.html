@@ -1,6 +1,6 @@
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Pull to refresh" refreshingSpinner="circles" refreshingText="Refreshing...">
+    <ion-refresher-content pullingText="Pull to refresh" refreshingSpinner="crescent" refreshingText="Updating ...">
     </ion-refresher-content>
   </ion-refresher>
   <ion-icon *ngIf="!stats.connection" color="danger" name="alert"></ion-icon>
@@ -20,9 +20,19 @@
       <span class="tag">BTC/day</span>
     </div>
     <div class="display-number small">
+      <span class="value">{{niceHashData.balanceHistory[0].btc|number:'1.8-8'}}</span>
+      <span class="tag">BTC balance</span>
+    </div>
+    <div class="display-number small" *ngIf="this.currentBtcPriceInUsd">
+      <span class="value">{{niceHashData.balanceHistory[0].btc*this.currentBtcPriceInUsd|number:'1.2-2'}}</span>
+      <span class="tag">EUR balance</span>
+    </div>
+    <!--
+    <div class="display-number small">
       <span class="value">{{niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.8-8'}}</span>
       <span class="tag">Accepted speed</span>
     </div>
+    -->
     <div class="display-number small">
       <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}</span>
       <span class="value" *ngIf="!niceHashData.balanceHistory[0].totalAcceptedSpeed">-.--</span>
