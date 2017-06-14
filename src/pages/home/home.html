@@ -41,6 +41,7 @@
     <div class="progress-bar">
       <div *ngIf="niceHashData.updateCountDown" class="fill" [style.width.%]="niceHashData.updateCountDown | async"></div>
     </div>
+    <div text-right class="last-update-tag" *ngIf="lastUpdateTimestamp">{{lastUpdateTimestamp.format('L [at] LT')}}</div>
   </div>
 
 </ion-content>

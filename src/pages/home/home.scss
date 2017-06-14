@@ -20,6 +20,11 @@ page-home {
             background: rgba(0,0,0,0.2);
         }
     }
+    .last-update-tag {
+        margin-top:4px;
+        font-size:10px;
+        color: color($colors, text-light);
+    }
     .icon.ion-md-alert {
         font-size:32px;
         padding:16px;

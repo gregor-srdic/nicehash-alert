@@ -18,7 +18,7 @@ export class SettingsPage {
 
   ionViewWillEnter() {
     this.currencyExchange.getUsdConversionRates().promise.then(r => {
-      this.availableCurrencies = ['USD'];
+      this.availableCurrencies = [];
       for (var key in r.rates)
         this.availableCurrencies.push(key);
     });

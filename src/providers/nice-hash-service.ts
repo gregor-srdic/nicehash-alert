@@ -211,6 +211,7 @@ export class NiceHashService {
     if (!this.settings.promptForAddressModal) {
       this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, { address: this.settings.address });
       this.settings.promptForAddressModal.onDidDismiss((address) => {
+        this.settings.promptForAddressModal = null;
         if (address) {
           this.settings.address = address;
           this.saveSettingsToLocalStorage();

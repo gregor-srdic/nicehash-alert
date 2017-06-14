@@ -6,6 +6,8 @@ import { NavController } from 'ionic-angular';
 import 'rxjs/add/operator/throttle';
 import 'rxjs/add/operator/sample';
 import { Observable, Subscription, Subject } from 'rxjs';
+import {Moment} from 'moment';
+import moment from 'moment';
 
 @Component({
   selector: 'page-home',
@@ -17,6 +19,7 @@ export class HomePage {
 
   private logTag: string = 'HomePage';
   private niceHashData: NiceHashData = null;
+  private lastUpdateTimestamp: Moment = null;
 
   private currentBtcPriceInUsd: number;
   private usdExchangeRates: CurrencyRates;
@@ -28,6 +31,7 @@ export class HomePage {
       connection: false
     };
     this.niceHashData.updateSubject.subscribe(next => {
+      this.lastUpdateTimestamp = moment();
       if (next) {
         this.stats.connection = true;
         this.updateStats();
