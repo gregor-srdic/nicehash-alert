@@ -38,19 +38,42 @@ export class NiceHashService {
       dfd.resolve(this.settings.profitabilityInBtc);
       return dfd;
     }
+    let oneHourAgo = Math.round(d.getTime()/1000) - 3600;
     this.http.get(
-      ` https://api.nicehash.com/api?method=stats.provider.ex&addr=${this.settings.address}&from=${d.getTime()}`,
+      ` https://api.nicehash.com/api?method=stats.provider.ex&from=${oneHourAgo}&addr=${this.settings.address}`,
       {}
     )
       .map(res => res.json())
       .subscribe(
       data => {
+        let profitability = 0;
         if (data.result && data.result.current) {
-          let profitability = 0;
           data.result.current.forEach(el => profitability += parseFloat(el.profitability));
           this.settings.profitabilityInBtc = profitability;
-          dfd.resolve(profitability);
         }
+        if(data.result && data.result.past && this.settings.balanceHistory.length==0){
+          let firstBalance: Balance = {
+            btc: 0,
+            timestamp: d.getTime(),
+            totalAcceptedSpeed: -1,
+            totalRejectedSpeed: 0
+          };
+          data.result.past.forEach(el => {
+            if(el.data&&el.data.length>0){
+              let e = el.data[0],
+                ts = e[0]*300*1000,
+                btc = parseFloat(e[2]);
+              if(ts==firstBalance.timestamp)
+                firstBalance.btc += btc;
+              else if(ts<firstBalance.timestamp){
+                firstBalance.timestamp = ts;
+                firstBalance.btc = btc;
+              }
+            }
+          });
+          this.settings.balanceHistory.push(firstBalance);
+        }
+        dfd.resolve(profitability);
       },
       err => dfd.reject(null)
       );

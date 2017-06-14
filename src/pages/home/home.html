@@ -34,8 +34,8 @@
     </div>
     -->
     <div class="display-number small">
-      <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}</span>
-      <span class="value" *ngIf="!niceHashData.balanceHistory[0].totalAcceptedSpeed">-.--</span>
+      <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed>0">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}</span>
+      <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed<=0">-.--</span>
       <span class="tag">Rejected percentage</span>
     </div>
     <div class="progress-bar">
