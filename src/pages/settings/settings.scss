@@ -1,3 +1,8 @@
 page-settings {
-
+    .item {
+        padding-left: 0;
+        .item-inner {
+            padding-left:16px;
+        }
+    }
 }

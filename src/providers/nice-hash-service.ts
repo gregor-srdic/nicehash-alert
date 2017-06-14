@@ -23,7 +23,9 @@ export class NiceHashService {
     updateSubject: new Subject<any>(),
     promptForAddressModal: null,
     profitabilityInBtc: 0,
-    updateCountDown: null
+    updateCountDown: null,
+    currency: 'USD',
+    silentMode: false
   };
 
   constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController) {
@@ -38,7 +40,7 @@ export class NiceHashService {
       dfd.resolve(this.settings.profitabilityInBtc);
       return dfd;
     }
-    let oneHourAgo = Math.round(d.getTime()/1000) - 3600;
+    let oneHourAgo = Math.round(d.getTime() / 1000) - 3600;
     this.http.get(
       ` https://api.nicehash.com/api?method=stats.provider.ex&from=${oneHourAgo}&addr=${this.settings.address}`,
       {}
@@ -51,7 +53,7 @@ export class NiceHashService {
           data.result.current.forEach(el => profitability += parseFloat(el.profitability));
           this.settings.profitabilityInBtc = profitability;
         }
-        if(data.result && data.result.past && this.settings.balanceHistory.length==0){
+        if (data.result && data.result.past && this.settings.balanceHistory.length == 0) {
           let firstBalance: Balance = {
             btc: 0,
             timestamp: d.getTime(),
@@ -59,13 +61,13 @@ export class NiceHashService {
             totalRejectedSpeed: 0
           };
           data.result.past.forEach(el => {
-            if(el.data&&el.data.length>0){
+            if (el.data && el.data.length > 0) {
               let e = el.data[0],
-                ts = e[0]*300*1000,
+                ts = e[0] * 300 * 1000,
                 btc = parseFloat(e[2]);
-              if(ts==firstBalance.timestamp)
+              if (ts == firstBalance.timestamp)
                 firstBalance.btc += btc;
-              else if(ts<firstBalance.timestamp){
+              else if (ts < firstBalance.timestamp) {
                 firstBalance.timestamp = ts;
                 firstBalance.btc = btc;
               }
@@ -123,7 +125,7 @@ export class NiceHashService {
     } else {
       this.getCurrentBalance().then(
         (cb) => {
-          if (cb && cb.totalAcceptedSpeed <= 0) {
+          if (cb && cb.totalAcceptedSpeed <= 0 && this.settings.silentMode) {
             this.localNotifications.schedule({
               id: 1,
               title: 'Rig Alert',
@@ -159,13 +161,19 @@ export class NiceHashService {
     let settings = tryToGetItemFromLocalStorage(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, true);
     if (!settings)
       return;
-    if (settings.address)
+    if (settings.address !== undefined)
       this.settings.address = settings.address;
+    if (settings.currency !== undefined)
+      this.settings.currency = settings.currency;
+    if (settings.silentMode !== undefined)
+      this.settings.silentMode = settings.silentMode;
   }
 
   private saveSettingsToLocalStorage() {
     let settings = {
-      address: this.settings.address
+      address: this.settings.address,
+      currency: this.settings.currency,
+      silentMode: this.settings.silentMode
     };
     window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, JSON.stringify(settings));
   }
@@ -173,7 +181,7 @@ export class NiceHashService {
   public startContinuousBalanceUpdate(): Deferred<any> {
     var dfd = new Deferred<any>();
     console.debug(`${this.logTag}: startContinuousBalanceUpdate`);
-    if(this.updateBalanceTimeout){
+    if (this.updateBalanceTimeout) {
       window.clearTimeout(this.updateBalanceTimeout);
       this.updateBalanceTimeout = null;
     }
@@ -199,9 +207,9 @@ export class NiceHashService {
     this.settings.updateCountDown = null;
   }
 
-  private promptForAddress() {
+  public promptForAddress() {
     if (!this.settings.promptForAddressModal) {
-      this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, {});
+      this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, { address: this.settings.address });
       this.settings.promptForAddressModal.onDidDismiss((address) => {
         if (address) {
           this.settings.address = address;

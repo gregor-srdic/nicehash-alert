@@ -8,11 +8,20 @@
 </ion-header>
 -->
 <ion-content>
-  <ion-list>
-    <ion-list-header>Follow us on Twitter</ion-list-header>
+  <ion-list *ngIf="settings">
     <ion-item>
-      <ion-icon name="ionic" item-left></ion-icon>
-      @ionicframework
+      <ion-label>Enable silent mode</ion-label>
+      <ion-toggle [(ngModel)]="settings.silentMode"></ion-toggle>
     </ion-item>
+    <ion-item>
+      <ion-label>Display currency</ion-label>
+      <ion-select [(ngModel)]="settings.currency">
+        <ion-option *ngFor="let c of availableCurrencies" value="{{c}}">{{c}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <button ion-item text-wrap (click)="niceHash.promptForAddress()">
+      <h2>Wallet address:</h2>
+      <h3>{{settings.address}}</h3>
+    </button>
   </ion-list>
 </ion-content>

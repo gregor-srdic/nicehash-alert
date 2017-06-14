@@ -72,6 +72,8 @@ export interface NiceHashData {
   promptForAddressModal: Modal;
   profitabilityInBtc: number;
   updateCountDown: Observable<number>;
+  currency: string;
+  silentMode: boolean;
 }
 export interface Stats {
   btc: number;
