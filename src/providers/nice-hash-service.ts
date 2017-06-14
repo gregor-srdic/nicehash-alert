@@ -31,7 +31,6 @@ export class NiceHashService {
     this.startContinuousBalanceUpdate();
   }
 
-
   private getProfitability(): Deferred<number> {
     let dfd = new Deferred<number>(),
       d = new Date();
@@ -57,7 +56,6 @@ export class NiceHashService {
       );
     return dfd;
   }
-
 
   private getCurrentBalance(): Promise<Balance> {
     return new Promise<Balance>((resolve, reject) => {
@@ -128,7 +126,7 @@ export class NiceHashService {
         let duration = r ? this.settings.updateBalanceInterval : 50000;
         this.updateBalanceTimeout = window.setTimeout(() => this.updateBalance(), duration);
         duration = duration / 1000;
-        this.settings.updateCountDown = Observable.timer(0, 1000).map(value => {console.log(value); return (value * 100) / duration; }).takeWhile(value => value < 100);
+        this.settings.updateCountDown = Observable.timer(0, 1000).map(value => (value * 100) / duration).takeWhile(value => value < 100);
       }
     });
     return dfd;
@@ -149,15 +147,22 @@ export class NiceHashService {
     window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, JSON.stringify(settings));
   }
 
-  public startContinuousBalanceUpdate() {
+  public startContinuousBalanceUpdate(): Deferred<any> {
+    var dfd = new Deferred<any>();
     console.debug(`${this.logTag}: startContinuousBalanceUpdate`);
+    if(this.updateBalanceTimeout){
+      window.clearTimeout(this.updateBalanceTimeout);
+      this.updateBalanceTimeout = null;
+    }
+    this.settings.updateCountDown = null;
     this.getProfitability().promise.then(
       profitability => {
         this.settings.updateBalanceActive = true;
         this.insomnia.keepAwake();
-        this.updateBalance();
+        this.updateBalance().promise.then(r => dfd.resolve(r));
       }
-    )
+    );
+    return dfd;
   }
 
   public stopContinuousBalanceUpdate() {

@@ -1,8 +1,8 @@
 {
-    "name": "ionic-hello-world",
+    "name": "nice-hash-alert",
     "version": "0.0.0",
-    "author": "Ionic Framework",
-    "homepage": "http://ionicframework.com/",
+    "author": "Gregor Srdic",
+    "homepage": "http://www.nomnio.com/",
     "private": true,
     "scripts": {
         "clean": "ionic-app-scripts clean",
