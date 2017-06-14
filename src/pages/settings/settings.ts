@@ -29,4 +29,11 @@ export class SettingsPage {
     }
   }
 
+  private updateSettings(){
+    console.log(1);
+    this.niceHash.settings.currency = this.settings.currency;
+    this.niceHash.settings.silentMode = this.settings.silentMode;
+    this.niceHash.saveSettingsToLocalStorage();
+  }
+
 }

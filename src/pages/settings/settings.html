@@ -11,11 +11,11 @@
   <ion-list *ngIf="settings">
     <ion-item>
       <ion-label>Enable silent mode</ion-label>
-      <ion-toggle [(ngModel)]="settings.silentMode"></ion-toggle>
+      <ion-toggle [(ngModel)]="settings.silentMode" (ionChange)="updateSettings()"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Display currency</ion-label>
-      <ion-select [(ngModel)]="settings.currency">
+      <ion-select [(ngModel)]="settings.currency" (ionChange)="updateSettings()">
         <ion-option *ngFor="let c of availableCurrencies" value="{{c}}">{{c}}</ion-option>
       </ion-select>
     </ion-item>

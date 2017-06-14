@@ -169,7 +169,7 @@ export class NiceHashService {
       this.settings.silentMode = settings.silentMode;
   }
 
-  private saveSettingsToLocalStorage() {
+  public saveSettingsToLocalStorage() {
     let settings = {
       address: this.settings.address,
       currency: this.settings.currency,
