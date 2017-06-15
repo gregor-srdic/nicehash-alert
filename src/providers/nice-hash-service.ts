@@ -206,7 +206,9 @@ export class NiceHashService {
       profitability => {
         if (profitability < 0) {
           this.settings.connectionError = false;
-          return window.setTimeout(() => this.startContinuousBalanceUpdate(true, dfd), 3000);
+          let duration = 3000;
+          this.settings.updateCountDown = Observable.timer(0, 1000).map(value => (value * 100) / duration).takeWhile(value => value < 100);
+          return window.setTimeout(() => this.startContinuousBalanceUpdate(true, dfd), duration);
         }
         this.settings.connectionError = true;
         this.settings.updateBalanceActive = true;

@@ -6,12 +6,15 @@
   </ion-refresher>
 
   <ion-icon *ngIf="niceHashData.connectionError" class="blink" name="ios-wifi"></ion-icon>
-  
+
   <ion-grid class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
 
     <ion-row>
       <ion-col col-12 class="display-number large">
-        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">{{stats.btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span><span *ngIf="!currentBtcPriceInUsd||!usdExchangeRates||!usdExchangeRates.rates[niceHashData.currency]">-.--</span></span>
+        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">{{stats.btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span
+          *ngIf="!currentBtcPriceInUsd||!usdExchangeRates||!usdExchangeRates.rates[niceHashData.currency]">-.--</span>
+          </span>
       </ion-col>
       <ion-col col-12 class="display-number">
         <span class="value"><span *ngIf="stats.btc!==null">{{stats.btc|number:'1.8-8'}}</span><span *ngIf="stats.btc===null">-.--</span></span>
@@ -21,7 +24,10 @@
 
     <ion-row>
       <ion-col col-6 class="display-number small">
-        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>0">{{niceHashData.balanceHistory[0].btc|number:'1.8-8'}}</span><span *ngIf="niceHashData.balanceHistory.length<1">-.--</span></span>
+        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>0">{{niceHashData.balanceHistory[0].btc|number:'1.8-8'}}</span>
+        <span
+          *ngIf="niceHashData.balanceHistory.length<1">-.--</span>
+          </span>
       </ion-col>
       <ion-col col-6 class="display-number small">
         <span class="value"><span *ngIf="stats.btc!==null">{{stats.btc|number:'1.8-8'}}</span><span *ngIf="stats.btc===null">-.--</span></span>
@@ -30,12 +36,18 @@
       <ion-col text-right col-6 class="display-number-tag">BTC balance</ion-col>
     </ion-row>
 
-    <ion-row>
+    <ion-row class="show-alert">
       <ion-col col-6 class="display-number small">
-        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>1">{{niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.4-4'}}</span><span *ngIf="niceHashData.balanceHistory.length<2">-.--</span></span>
+        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>1">{{niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.4-4'}}</span>
+        <span
+          *ngIf="niceHashData.balanceHistory.length<2">-.--</span>
+          </span>
       </ion-col>
       <ion-col col-6 class="display-number small">
-        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>1">{{(niceHashData.balanceHistory[0].totalRejectedSpeed*100)/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}%</span><span *ngIf="niceHashData.balanceHistory.length<2">-.--</span></span>
+        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>1&&niceHashData.balanceHistory[0].totalAcceptedSpeed">{{(niceHashData.balanceHistory[0].totalRejectedSpeed*100)/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}%</span>
+        <span
+          *ngIf="niceHashData.balanceHistory.length<2||!niceHashData.balanceHistory[0].totalAcceptedSpeed">-.--</span>
+          </span>
       </ion-col>
       <ion-col text-right col-6 class="display-number-tag">Accepted</ion-col>
       <ion-col text-right col-6 class="display-number-tag">Rejected</ion-col>
@@ -46,13 +58,22 @@
         <span class="value"><span *ngIf="currentBtcPriceInUsd">{{currentBtcPriceInUsd|number:'1.2-2'}}</span><span *ngIf="!currentBtcPriceInUsd">-.--</span></span>
       </ion-col>
       <ion-col col-6 class="display-number smallest">
-        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates">{{currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span><span *ngIf="!currentBtcPriceInUsd||!usdExchangeRates">-.--</span></span>
+        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates">{{currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span
+          *ngIf="!currentBtcPriceInUsd||!usdExchangeRates">-.--</span>
+          </span>
       </ion-col>
       <ion-col text-right col-6 class="display-number-tag smallest">BTC to USD</ion-col>
       <ion-col text-right col-6 class="display-number-tag smallest">BTC to {{niceHashData.currency}}</ion-col>
     </ion-row>
-
   </ion-grid>
+
+  <div class="update-status">
+    <div class="progress-bar">
+      <div *ngIf="niceHashData.updateCountDown" class="fill" [style.width.%]="niceHashData.updateCountDown | async"></div>
+    </div>
+    <div block text-right class="last-update-tag" *ngIf="lastUpdateTimestamp">{{lastUpdateTimestamp.format('LL [at] LT')}}</div>
+  </div>
   <!--
   <div class="stats-container" *ngIf="niceHashData.balanceHistory.length>0">
     <div class="display-number large">
@@ -91,7 +112,7 @@
     </div>
     <div text-right class="last-update-tag" *ngIf="lastUpdateTimestamp">{{lastUpdateTimestamp.format('L [at] LT')}}</div>
   </div>
-  -->
   <div *ngIf="niceHashData.alertActive" class="rig-alert">Mining stopped!!!</div>
+  -->
 
 </ion-content>

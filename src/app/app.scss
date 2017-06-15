@@ -18,6 +18,8 @@
         }
     }
     &.smallest {
+        padding-top: 0;
+        padding-bottom: 0;
         .value {
             font-size: 14px;
             line-height: 14px;
@@ -33,6 +35,8 @@
     font-weight: 300;
     &.smallest {
         font-size: 12px;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 }
 
@@ -40,6 +44,16 @@
 .item-select .label-md,
 .item-datetime .label-md {
     color: color($colors, text-primary);
+}
+
+.alert {
+    .show-alert {
+        background: color($colors, danger);
+        .display-number .value,
+        .display-number-tag {
+            color: color($colors, text-dark-night);
+        }
+    }
 }
 
 @keyframes blink {

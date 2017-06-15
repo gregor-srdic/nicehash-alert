@@ -30,14 +30,18 @@ page-home {
             margin-top:16px;
         }
     }
-    .progress-bar {
-        margin-top: 32px;
-        width: 100%;
-        height: 8px;
-        background: rgba(0, 0, 0, 0.1);
-        .fill {
-            height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+    .update-status {
+        padding: 0 10px;
+        opacity: 0.6;
+        .progress-bar {
+            margin-top: 32px;
+            width: 100%;
+            height: 8px;
+            background: color($colors, text-light);
+            .fill {
+                height: 100%;
+                background: rgba(0, 0, 0, 0.4);
+            }
         }
     }
     .last-update-tag {
@@ -52,8 +56,5 @@ page-home {
         left: 0;
         top: 0;
         color: color($colors, text-primary);
-    }
-    .alert {
-
     }
 }
