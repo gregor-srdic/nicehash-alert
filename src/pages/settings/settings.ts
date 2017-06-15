@@ -12,16 +12,20 @@ export class SettingsPage {
 
   private settings: any;
   private availableCurrencies: string[];
+  private btcExchangeRate: number;
+  private usdExchangeRates: CurrencyRates;
 
   constructor(public navCtrl: NavController, private niceHash: NiceHashService, private currencyExchange: CurrencyExchangeService) {
   }
 
   ionViewWillEnter() {
     this.currencyExchange.getUsdConversionRates().promise.then(r => {
+      this.usdExchangeRates = r;
       this.availableCurrencies = [];
       for (var key in r.rates)
         this.availableCurrencies.push(key);
     });
+    this.currencyExchange.getBtcExchangeRate().promise.then(r => this.btcExchangeRate = r);
     this.settings = {
       address: this.niceHash.settings.address,
       silentMode: this.niceHash.settings.silentMode,

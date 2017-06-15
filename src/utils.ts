@@ -75,10 +75,10 @@ export interface NiceHashData {
   currency: string;
   silentMode: boolean;
   alertActive: boolean;
+  connectionError: boolean;
 }
 export interface Stats {
   btc: number;
-  connection: boolean;
 }
 export function tryToGetItemFromLocalStorage(key: string, parseJson: boolean): any {
   let item;

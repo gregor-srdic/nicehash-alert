@@ -26,7 +26,8 @@ export class NiceHashService {
     updateCountDown: null,
     currency: 'USD',
     silentMode: false,
-    alertActive: false
+    alertActive: false,
+    connectionError: false
   };
 
   constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController, private zone: NgZone) {
@@ -128,6 +129,7 @@ export class NiceHashService {
         (cb) => {
           if (!cb)
             return dfd.resolve(false);
+          this.settings.connectionError = false;
           if (cb.totalAcceptedSpeed <= 0) {
             console.debug(`${this.logTag}: totalAcceptedSpeed failed to 0`);
             this.settings.alertActive = true;
@@ -153,6 +155,7 @@ export class NiceHashService {
           dfd.resolve(true);
         },
         err => {
+          this.settings.connectionError = true;
           this.settings.updateSubject.next(false);
           dfd.resolve(false);
         }
@@ -201,8 +204,11 @@ export class NiceHashService {
     this.settings.updateCountDown = null;
     this.getProfitability().promise.then(
       profitability => {
-        if (profitability < 0)
+        if (profitability < 0) {
+          this.settings.connectionError = false;
           return window.setTimeout(() => this.startContinuousBalanceUpdate(true, dfd), 3000);
+        }
+        this.settings.connectionError = true;
         this.settings.updateBalanceActive = true;
         this.insomnia.keepAwake();
         this.updateBalance().promise.then(r => dfd.resolve(r));

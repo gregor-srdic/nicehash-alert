@@ -1,28 +1,60 @@
 .display-number {
-    .value,
-    .tag {
-        display: block;
-        width: 100%;
-        text-align: right;
-    }
     .value {
         font-size: 32px;
-        line-height:  32px;
+        line-height: 32px;
         color: color($colors, text-primary);
-    }
-    .tag {
-        color: color($colors, text-light);
-        text-transform: uppercase;
     }
     &.large {
         .value {
-            font-size: 64px;
-            line-height:  64px;
+            font-size: 72px;
+            font-weight: 300;
+            line-height: 64px;
+        }
+    }
+    &.small {
+        .value {
+            font-size: 24px;
+            line-height: 24px;
+        }
+    }
+    &.smallest {
+        .value {
+            font-size: 14px;
+            line-height: 14px;
         }
     }
 }
+
+.display-number-tag {
+    font-size: 16px;
+    line-height: 16px;
+    color: color($colors, text-light);
+    text-transform: uppercase;
+    font-weight: 300;
+    &.smallest {
+        font-size: 12px;
+    }
+}
+
 .item-input .label-md,
-.item-select .label-md, 
+.item-select .label-md,
 .item-datetime .label-md {
-        color: color($colors, text-primary);
+    color: color($colors, text-primary);
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+
+@-webkit-keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+
+.blink {
+    animation: blink 1s linear infinite;
+    -webkit-animation: blink 1s linear infinite;
 }

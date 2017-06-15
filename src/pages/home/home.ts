@@ -27,17 +27,12 @@ export class HomePage {
   constructor(public navCtrl: NavController, private niceHash: NiceHashService, private currencyExchange: CurrencyExchangeService) {
     this.niceHashData = this.niceHash.settings;
     this.stats = {
-      btc: null,
-      connection: false
+      btc: null
     };
     this.niceHashData.updateSubject.subscribe(next => {
       this.lastUpdateTimestamp = moment();
-      if (next) {
-        this.stats.connection = true;
+      if (next)
         this.updateStats();
-      }
-      else
-        this.stats.connection = false;
     });
   }
 

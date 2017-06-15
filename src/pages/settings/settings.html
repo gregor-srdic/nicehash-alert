@@ -1,12 +1,3 @@
-<!--
-  <ion-header>
-  <ion-navbar>
-    <ion-title>
-      Settings
-    </ion-title>
-  </ion-navbar>
-</ion-header>
--->
 <ion-content>
   <ion-list *ngIf="settings">
     <ion-item>
@@ -24,5 +15,14 @@
       <h3>{{settings.address}}</h3>
       <ion-icon name="ios-arrow-forward" item-right></ion-icon>
     </button>
+    <!--
+    <ion-item>
+      BTC price
+      <div item-right>
+        <div>{{btcExchangeRate|number:'1.2-2'}} USD</div>
+        <div *ngIf="usdExchangeRates">{{btcExchangeRate*usdExchangeRates.rates[settings.currency]|number:'1.2-2'}} {{settings.currency}}</div>
+      </div>
+    </ion-item>
+    -->
   </ion-list>
 </ion-content>
