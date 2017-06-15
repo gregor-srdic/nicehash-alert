@@ -29,11 +29,14 @@ export class SettingsPage {
     }
   }
 
-  private updateSettings(){
-    console.log(1);
+  private updateSettings() {
     this.niceHash.settings.currency = this.settings.currency;
     this.niceHash.settings.silentMode = this.settings.silentMode;
     this.niceHash.saveSettingsToLocalStorage();
+  }
+
+  private openEditAddressModal() {
+    this.niceHash.promptForAddress().promise.then(address => this.settings.address = address ? address : this.settings.address);
   }
 
 }

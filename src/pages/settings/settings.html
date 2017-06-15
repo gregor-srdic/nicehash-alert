@@ -19,10 +19,10 @@
         <ion-option *ngFor="let c of availableCurrencies" value="{{c}}">{{c}}</ion-option>
       </ion-select>
     </ion-item>
-    <button ion-item text-wrap (click)="niceHash.promptForAddress()">
+    <button ion-item text-wrap (click)="openEditAddressModal()">
       <h2>Wallet address:</h2>
       <h3>{{settings.address}}</h3>
-      <ion-icon name="arrow-forward" item-right></ion-icon>
+      <ion-icon name="ios-arrow-forward" item-right></ion-icon>
     </button>
   </ion-list>
 </ion-content>

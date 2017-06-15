@@ -1,4 +1,17 @@
 page-home {
+    .scroll-content {
+        padding-bottom:40px;
+    }
+    .rig-alert {
+        position:absolute;
+        bottom:0;
+        width:100%;
+        left:0;
+        line-height:40px;
+        background-color: color($colors,danger);
+        color:#FFF;
+        text-align: center;
+    }
     .stats-container {
         background: #FFF;
         max-width: 240px;

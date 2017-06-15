@@ -1,7 +1,7 @@
 import { PromptForAddressModal } from '../pages/modals/prompt-for-address';
 import { Observable, Subject } from 'rxjs/Rx';
 import { AppConstants, Balance, Deferred, NiceHashData, tryToGetItemFromLocalStorage } from '../utils';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LocalNotifications } from '@ionic-native/local-notifications';
@@ -25,12 +25,13 @@ export class NiceHashService {
     profitabilityInBtc: 0,
     updateCountDown: null,
     currency: 'USD',
-    silentMode: false
+    silentMode: false,
+    alertActive: false
   };
 
-  constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController) {
+  constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController, private zone: NgZone) {
     this.readSettingsFromLocalStorage();
-    this.startContinuousBalanceUpdate();
+    this.startContinuousBalanceUpdate(false);
   }
 
   private getProfitability(): Deferred<number> {
@@ -77,7 +78,7 @@ export class NiceHashService {
         }
         dfd.resolve(profitability);
       },
-      err => dfd.reject(null)
+      err => dfd.resolve(-1)
       );
     return dfd;
   }
@@ -125,12 +126,23 @@ export class NiceHashService {
     } else {
       this.getCurrentBalance().then(
         (cb) => {
-          if (cb && cb.totalAcceptedSpeed <= 0 && this.settings.silentMode) {
-            this.localNotifications.schedule({
+          if (!cb)
+            return dfd.resolve(false);
+          if (cb.totalAcceptedSpeed <= 0) {
+            console.debug(`${this.logTag}: totalAcceptedSpeed failed to 0`);
+            this.settings.alertActive = true;
+            let notificationConfig: any = {
               id: 1,
               title: 'Rig Alert',
-              text: 'Mining speed failed to zero!',
-            });
+              text: 'Mining stopped!!!',
+              led: 'FF0000'
+            };
+            if (this.settings.silentMode)
+              notificationConfig.sound = null;
+            this.localNotifications.schedule(notificationConfig);
+          } else {
+            this.settings.alertActive = false;
+            this.localNotifications.cancel(1);
           }
           let l = this.settings.balanceHistory.length;
           if (l == 0 || this.settings.balanceHistory[l - 1].btc != cb.btc)
@@ -178,8 +190,9 @@ export class NiceHashService {
     window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, JSON.stringify(settings));
   }
 
-  public startContinuousBalanceUpdate(): Deferred<any> {
-    var dfd = new Deferred<any>();
+  public startContinuousBalanceUpdate(isRetry: boolean, dfd?: Deferred<any>): Deferred<any> {
+    if (!dfd)
+      dfd = new Deferred<any>();
     console.debug(`${this.logTag}: startContinuousBalanceUpdate`);
     if (this.updateBalanceTimeout) {
       window.clearTimeout(this.updateBalanceTimeout);
@@ -188,6 +201,8 @@ export class NiceHashService {
     this.settings.updateCountDown = null;
     this.getProfitability().promise.then(
       profitability => {
+        if (profitability < 0)
+          return window.setTimeout(() => this.startContinuousBalanceUpdate(true, dfd), 3000);
         this.settings.updateBalanceActive = true;
         this.insomnia.keepAwake();
         this.updateBalance().promise.then(r => dfd.resolve(r));
@@ -207,7 +222,8 @@ export class NiceHashService {
     this.settings.updateCountDown = null;
   }
 
-  public promptForAddress() {
+  public promptForAddress(): Deferred<string> {
+    let dfd = new Deferred<string>();
     if (!this.settings.promptForAddressModal) {
       this.settings.promptForAddressModal = this.modalCtrl.create(PromptForAddressModal, { address: this.settings.address });
       this.settings.promptForAddressModal.onDidDismiss((address) => {
@@ -215,10 +231,19 @@ export class NiceHashService {
         if (address) {
           this.settings.address = address;
           this.saveSettingsToLocalStorage();
+          this.stopContinuousBalanceUpdate();
+          this.settings.balanceHistory = [];
+          this.settings.profitabilityInBtc = 0;
+          this.startContinuousBalanceUpdate(false);
+          dfd.resolve(address);
         }
-      })
+        dfd.resolve(null);
+      });
       this.settings.promptForAddressModal.present();
+    } else {
+      dfd.resolve(null);
     }
+    return dfd;
   }
 
 }

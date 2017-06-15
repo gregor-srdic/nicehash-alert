@@ -74,6 +74,7 @@ export interface NiceHashData {
   updateCountDown: Observable<number>;
   currency: string;
   silentMode: boolean;
+  alertActive: boolean;
 }
 export interface Stats {
   btc: number;

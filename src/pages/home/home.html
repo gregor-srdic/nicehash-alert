@@ -34,7 +34,7 @@
     </div>
     -->
     <div class="display-number small">
-      <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed>0">{{niceHashData.balanceHistory[0].totalRejectedSpeed/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}</span>
+      <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed>0">{{(niceHashData.balanceHistory[0].totalRejectedSpeed*100)/niceHashData.balanceHistory[0].totalAcceptedSpeed|number:'1.2-2'}}</span>
       <span class="value" *ngIf="niceHashData.balanceHistory[0].totalAcceptedSpeed<=0">-.--</span>
       <span class="tag">Rejected percentage</span>
     </div>
@@ -43,5 +43,5 @@
     </div>
     <div text-right class="last-update-tag" *ngIf="lastUpdateTimestamp">{{lastUpdateTimestamp.format('L [at] LT')}}</div>
   </div>
-
+  <div *ngIf="niceHashData.alertActive" class="rig-alert">Mining stopped!!!</div>
 </ion-content>
