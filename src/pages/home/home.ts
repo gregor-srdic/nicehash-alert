@@ -48,7 +48,6 @@ export class HomePage {
       then(([currentBtcPriceInUsd, usdExchangeRates]) => {
         this.currentBtcPriceInUsd = currentBtcPriceInUsd;
         this.usdExchangeRates = usdExchangeRates;
-        console.log(this.niceHashData.balanceHistory);
         let l = this.niceHashData.balanceHistory.length - 1;
         if (l == 0)
           this.stats.btc = this.niceHashData.profitabilityInBtc;
