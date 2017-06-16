@@ -205,12 +205,12 @@ export class NiceHashService {
     this.getProfitability().promise.then(
       profitability => {
         if (profitability < 0) {
-          this.settings.connectionError = false;
+          this.settings.connectionError = true;
           let duration = 3000;
           this.settings.updateCountDown = Observable.timer(0, 1000).map(value => (value * 100) / duration).takeWhile(value => value < 100);
           return window.setTimeout(() => this.startContinuousBalanceUpdate(true, dfd), duration);
         }
-        this.settings.connectionError = true;
+        this.settings.connectionError = false;
         this.settings.updateBalanceActive = true;
         this.insomnia.keepAwake();
         this.updateBalance().promise.then(r => dfd.resolve(r));
