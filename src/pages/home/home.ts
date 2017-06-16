@@ -6,7 +6,7 @@ import { NavController } from 'ionic-angular';
 import 'rxjs/add/operator/throttle';
 import 'rxjs/add/operator/sample';
 import { Observable, Subscription, Subject } from 'rxjs';
-import {Moment} from 'moment';
+import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
@@ -48,11 +48,24 @@ export class HomePage {
       then(([currentBtcPriceInUsd, usdExchangeRates]) => {
         this.currentBtcPriceInUsd = currentBtcPriceInUsd;
         this.usdExchangeRates = usdExchangeRates;
+        console.log(this.niceHashData.balanceHistory);
         let l = this.niceHashData.balanceHistory.length - 1;
         if (l == 0)
           this.stats.btc = this.niceHashData.profitabilityInBtc;
-        else if (l > 0) 
-          this.stats.btc = ((this.niceHashData.balanceHistory[0].btc - this.niceHashData.balanceHistory[l].btc) * 24 * 3600 * 1000) / (this.niceHashData.balanceHistory[0].timestamp - this.niceHashData.balanceHistory[l].timestamp);
+        else if (l > 0) {
+          let d = (new Date()).getTime(),
+            btcDifference = 0,
+            timeDifference = 0;
+          this.niceHashData.balanceHistory.forEach((el, i) => {
+            if (d - el.timestamp < (3600 * 1000) && i < l) {
+              let prevEl = this.niceHashData.balanceHistory[i + 1];
+              btcDifference += (el.btc >= prevEl.btc) ? (el.btc - prevEl.btc) : el.btc;
+              timeDifference += el.timestamp - prevEl.timestamp;
+            }
+          });
+          this.stats.btc = (btcDifference * 24 * 3600 * 1000) / timeDifference;
+
+        }
 
       });
   }
