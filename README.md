@@ -1,5 +1,5 @@
 # NiceHash Alert Ionic Mobile app
-Application for monitoring your crypto mining progress on the [NiceHash](for https://new.nicehash.com/) account.
+Application for monitoring your crypto mining progress on the [NiceHash](https://new.nicehash.com/) account.
 
 ## Main Features
 * Notify when your mining speed has fallen to 0
