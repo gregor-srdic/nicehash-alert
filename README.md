@@ -4,6 +4,9 @@ Cordova based hybrid mobile app, builth with [Ionic](http://ionicframework.com/)
 
 **This is an unofficial 3rd party application that uses NiceHash api and was not developed by or for NiceHash company.**
 
+#Avaliable on Google Play
+[NiceHash Alert](https://play.google.com/store/apps/details?id=com.gregorsrdic.nicehashalert)
+
 ## Main Features
 * Notify when your mining speed has fallen to 0
 * Display average daily earnings in BTC and chosen currency
