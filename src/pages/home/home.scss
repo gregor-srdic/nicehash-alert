@@ -17,6 +17,7 @@ page-home {
         margin: auto;
         display: flex;
         flex-wrap: wrap;
+        max-width:460px;
         .display-number {
             text-align: right;
         }
