@@ -18,7 +18,7 @@
 
     <ion-row>
       <ion-col col-12 class="display-number large">
-        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">{{stats.btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates&&usdExchangeRates.rates[niceHashData.currency]">{{stats.btc*currentBtcPriceInUsd.value*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
         <span
           *ngIf="!currentBtcPriceInUsd||!usdExchangeRates||!usdExchangeRates.rates[niceHashData.currency]">-.--</span>
           </span>
@@ -31,7 +31,7 @@
 
     <ion-row>
       <ion-col col-6 class="display-number small">
-        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>0&&currentBtcPriceInUsd&&usdExchangeRates">{{niceHashData.balanceHistory[0].btc*currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span class="value"><span *ngIf="niceHashData.balanceHistory.length>0&&currentBtcPriceInUsd&&usdExchangeRates">{{niceHashData.balanceHistory[0].btc*currentBtcPriceInUsd.value*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
         <span
           *ngIf="niceHashData.balanceHistory.length<1||!currentBtcPriceInUsd||!usdExchangeRates">-.--</span>
           </span>
@@ -62,10 +62,10 @@
 
     <ion-row>
       <ion-col col-6 class="display-number smallest">
-        <span class="value"><span *ngIf="currentBtcPriceInUsd">{{currentBtcPriceInUsd|number:'1.2-2'}}</span><span *ngIf="!currentBtcPriceInUsd">-.--</span></span>
+        <span class="value"><span *ngIf="currentBtcPriceInUsd">{{currentBtcPriceInUsd.value|number:'1.2-2'}}</span><span *ngIf="!currentBtcPriceInUsd">-.--</span></span>
       </ion-col>
       <ion-col col-6 class="display-number smallest">
-        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates">{{currentBtcPriceInUsd*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
+        <span class="value"><span *ngIf="currentBtcPriceInUsd&&usdExchangeRates">{{currentBtcPriceInUsd.value*usdExchangeRates.rates[niceHashData.currency]|number:'1.2-2'}}</span>
         <span
           *ngIf="!currentBtcPriceInUsd||!usdExchangeRates">-.--</span>
           </span>

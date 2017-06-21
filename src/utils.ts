@@ -4,6 +4,7 @@ import { Modal } from 'ionic-angular';
 export class AppConstants {
   public static LOCALSTORAGE_KEYS = {
     currencyConversionRates: 'currencyConversionRates',
+    btcExchangeRate: 'btcExchangeRate',
     niceHashSettings: 'niceHashSettings'
   };
 }
@@ -17,6 +18,10 @@ export class Deferred<T> {
       this.reject = reject;
     });
   }
+}
+export interface BtcExchangeRate {
+  value: number;
+  timestamp: number;
 }
 export interface CurrencyRates {
   retreivedDate: string;

@@ -1,4 +1,4 @@
-import { CurrencyRates } from '../../utils';
+import { CurrencyRates, BtcExchangeRate } from '../../utils';
 import { CurrencyExchangeService } from '../../providers/currency-exchange-service';
 import { NiceHashService } from '../../providers/nice-hash-service';
 import { Component } from '@angular/core';
@@ -12,7 +12,7 @@ export class SettingsPage {
 
   private settings: any;
   private availableCurrencies: string[];
-  private btcExchangeRate: number;
+  private btcExchangeRate: BtcExchangeRate;
   private usdExchangeRates: CurrencyRates;
 
   constructor(public navCtrl: NavController, private niceHash: NiceHashService, private currencyExchange: CurrencyExchangeService) {

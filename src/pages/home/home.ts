@@ -1,4 +1,4 @@
-import { Balance, CurrencyRates, NiceHashData, Stats } from '../../utils';
+import { Balance, CurrencyRates, BtcExchangeRate, NiceHashData, Stats } from '../../utils';
 import { CurrencyExchangeService } from '../../providers/currency-exchange-service';
 import { NiceHashService } from '../../providers/nice-hash-service';
 import { Component } from '@angular/core';
@@ -21,7 +21,7 @@ export class HomePage {
   private niceHashData: NiceHashData = null;
   private lastUpdateTimestamp: Moment = null;
 
-  private currentBtcPriceInUsd: number;
+  private currentBtcPriceInUsd: BtcExchangeRate;
   private usdExchangeRates: CurrencyRates;
 
   constructor(public navCtrl: NavController, private niceHash: NiceHashService, private currencyExchange: CurrencyExchangeService) {
