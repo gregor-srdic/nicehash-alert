@@ -56,25 +56,31 @@ export class NiceHashService {
           this.settings.profitabilityInBtc = profitability;
         }
         if (data.result && data.result.past && this.settings.balanceHistory.length == 0) {
+
+          let past: any = {};
+          data.result.past.forEach(algo => {
+            if (algo.data && algo.data.length > 0) {
+              algo.data.forEach(algoProfit => {
+                let ts = algoProfit[0] * 300 * 1000,
+                  btc = parseFloat(algoProfit[2]);
+                past[ts] = past[ts] ? past[ts] + btc : btc;
+              });
+            }
+          });
           let firstBalance: Balance = {
             btc: 0,
             timestamp: d.getTime(),
             totalAcceptedSpeed: -1,
             totalRejectedSpeed: 0
           };
-          data.result.past.forEach(el => {
-            if (el.data && el.data.length > 0) {
-              let e = el.data[0],
-                ts = e[0] * 300 * 1000,
-                btc = parseFloat(e[2]);
-              if (ts == firstBalance.timestamp)
-                firstBalance.btc += btc;
-              else if (ts < firstBalance.timestamp) {
-                firstBalance.timestamp = ts;
-                firstBalance.btc = btc;
-              }
+          for (var key in past) {
+            let ts = parseInt(key),
+              btc = past[key];
+            if (ts < firstBalance.timestamp || btc < firstBalance.btc) {
+              firstBalance.timestamp = ts;
+              firstBalance.btc = btc;
             }
-          });
+          }
           this.settings.balanceHistory.push(firstBalance);
         }
         dfd.resolve(profitability);
