@@ -50,41 +50,7 @@ export class NiceHashService {
       .map(res => res.json())
       .subscribe(
       data => {
-        let profitability = 0;
-        if (data.result && data.result.current) {
-          data.result.current.forEach(el => profitability += parseFloat(el.profitability));
-          this.settings.profitabilityInBtc = profitability;
-        }
-        if (data.result && data.result.past && this.settings.balanceHistory.length == 0) {
-
-          let past: any = {};
-          data.result.past.forEach(algo => {
-            if (algo.data && algo.data.length > 0) {
-              algo.data.forEach(algoProfit => {
-                let ts = algoProfit[0] * 300 * 1000,
-                  btc = parseFloat(algoProfit[2]);
-                past[ts] = past[ts] ? past[ts] + btc : btc;
-              });
-            }
-          });
-          let firstBalance: Balance = {
-            btc: 0,
-            timestamp: d.getTime(),
-            totalAcceptedSpeed: -1,
-            totalRejectedSpeed: 0,
-            algos: []
-          };
-          for (var key in past) {
-            let ts = parseInt(key),
-              btc = past[key];
-            if (ts < firstBalance.timestamp || btc < firstBalance.btc) {
-              firstBalance.timestamp = ts;
-              firstBalance.btc = btc;
-            }
-          }
-          this.settings.balanceHistory.push(firstBalance);
-        }
-        dfd.resolve(profitability);
+        dfd.resolve(this.parsePastProfitabilityData(data, oneHourAgo * 1000));
       },
       err => dfd.resolve(-1)
       );
@@ -196,6 +162,56 @@ export class NiceHashService {
       this.settings.currency = settings.currency;
     if (settings.silentMode !== undefined)
       this.settings.silentMode = settings.silentMode;
+  }
+
+  private parsePastProfitabilityData(data, pastTime) {
+    let profitability = 0;
+    if (data.result && data.result.current) {
+      data.result.current.forEach(el => profitability += parseFloat(el.profitability));
+      this.settings.profitabilityInBtc = profitability;
+    }
+    if (data.result && data.result.past && this.settings.balanceHistory.length == 0) {
+      let firstInfo = null,
+        lastInfo = null,
+        pastBtc = 0;
+      data.result.past.forEach(algo => {
+        if (algo.data && algo.data.length > 0) {
+          algo.data.forEach(algoProfit => {
+            let ts = algoProfit[0] * 300 * 1000,
+              btc = parseFloat(algoProfit[2]);
+            if (!firstInfo || ts < firstInfo.ts)
+              firstInfo = {
+                ts: ts,
+                btc: btc
+              };
+            else if (ts == firstInfo.ts)
+              firstInfo.btc += btc;
+            if (!lastInfo || ts > lastInfo.ts)
+              lastInfo = {
+                ts: ts,
+                btc: btc
+              };
+            else if (ts == lastInfo.ts)
+              lastInfo.btc += btc;
+          });
+        }
+      });
+      if (firstInfo && lastInfo) {
+        pastBtc = lastInfo.btc - firstInfo.btc;
+        pastTime = firstInfo.ts;
+      }
+      if (data.result.payments)
+        data.result.payments.forEach(p => pastBtc += parseFloat(p.amount));
+      let firstBalance: Balance = {
+        btc: lastInfo.btc - pastBtc,
+        timestamp: pastTime,
+        totalAcceptedSpeed: -1,
+        totalRejectedSpeed: 0,
+        algos: []
+      }
+      this.settings.balanceHistory.push(firstBalance);
+    }
+    return profitability;
   }
 
   public saveSettingsToLocalStorage() {
