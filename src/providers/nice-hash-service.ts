@@ -1,6 +1,6 @@
 import { PromptForAddressModal } from '../pages/modals/prompt-for-address';
 import { Observable, Subject } from 'rxjs/Rx';
-import { AppConstants, Balance, Deferred, NiceHashData, tryToGetItemFromLocalStorage } from '../utils';
+import { AppConstants, Balance, Deferred, NiceHashData, AlgoData, AlgorithmsMap, tryToGetItemFromLocalStorage } from '../utils';
 import { Injectable, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
@@ -71,7 +71,8 @@ export class NiceHashService {
             btc: 0,
             timestamp: d.getTime(),
             totalAcceptedSpeed: -1,
-            totalRejectedSpeed: 0
+            totalRejectedSpeed: 0,
+            algos: []
           };
           for (var key in past) {
             let ts = parseInt(key),
@@ -102,17 +103,24 @@ export class NiceHashService {
           if (data.result && data.result.stats) {
             let btcBalance = 0,
               totalAcceptedSpeed = 0,
-              totalRejectedSpeed = 0;
+              totalRejectedSpeed = 0,
+              algos: AlgoData[] = [];
             data.result.stats.forEach(el => {
               btcBalance += parseFloat(el.balance);
               totalAcceptedSpeed += parseFloat(el.accepted_speed);
               totalRejectedSpeed += parseFloat(el.rejected_speed);
+              algos.push({
+                name: AlgorithmsMap[el.algo],
+                acceptedSpeed: parseFloat(el.accepted_speed),
+                rejectedSpeed: parseFloat(el.rejected_speed)
+              });
             });
             return resolve({
               timestamp: (new Date).getTime(),
               btc: btcBalance,
               totalAcceptedSpeed: totalAcceptedSpeed,
-              totalRejectedSpeed: totalRejectedSpeed
+              totalRejectedSpeed: totalRejectedSpeed,
+              algos: algos
             });
           }
           reject(null);
