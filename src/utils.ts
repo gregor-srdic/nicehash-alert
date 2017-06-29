@@ -7,6 +7,9 @@ export class AppConstants {
     btcExchangeRate: 'btcExchangeRate',
     niceHashSettings: 'niceHashSettings'
   };
+  public static APP_EVENTS = {
+    APP_THEME_UPDATE: 'APP_THEME_UPDATE'
+  }
 }
 export class Deferred<T> {
   promise: Promise<T>;
@@ -87,6 +90,7 @@ export interface NiceHashData {
   silentMode: boolean;
   alertActive: boolean;
   connectionError: boolean;
+  darkTheme: boolean;
 }
 export interface Stats {
   btc: number;

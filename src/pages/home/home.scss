@@ -59,3 +59,12 @@ page-home {
         color: color($colors, text-primary);
     }
 }
+
+.dark page-home {
+    .icon.ion-ios-wifi {
+        color: color($colors, text-dark-night);
+    }
+    .stats-container {
+        background: color($colors, dark-background);
+    }
+}

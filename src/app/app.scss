@@ -65,7 +65,7 @@
     .message {
         font-size: 16px;
         padding: 16px;
-        color:color($colors, text-primary);
+        color: color($colors, text-primary);
         text-align: center;
     }
 }
@@ -85,4 +85,55 @@
 .blink {
     animation: blink 1s linear infinite;
     -webkit-animation: blink 1s linear infinite;
+}
+
+.dark {
+    .content,
+    .alert-wrapper {
+        background: color($colors, dark-background);
+        color: color($colors, text-dark-night);
+        .alert-button {
+            color: color($colors, text-dark-night);
+        }
+        .alert-radio-button .alert-radio-label {
+            color: color($colors, text-light);
+        }
+        .alert-radio-button[aria-checked=true]  .alert-radio-label {
+            color: color($colors, text-dark-night);
+        }
+        .item {
+            background-color: transparent;
+            .label {
+                color: color($colors, text-light);
+            }
+            .text-input {
+                color: color($colors, text-dark-night);
+            }
+        }
+    }
+    .tabs .tabbar {
+        background: color($colors, dark-tabs);
+        .tab-button {
+            &,
+            .icon {
+                color: color($colors, text-light);
+            }
+        }
+        .tab-button[aria-selected=true] {
+            &,
+            .icon {
+                color: color($colors, text-dark-night);
+            }
+        }
+    }
+    .display-number {
+        .value {
+            color: color($colors, text-dark-night);
+        }
+    }
+    .message-container {
+        .message {
+            color: color($colors, text-dark-night);
+        }
+    }
 }

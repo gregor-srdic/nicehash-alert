@@ -6,7 +6,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Insomnia } from '@ionic-native/insomnia';
-import { ModalController, Modal } from 'ionic-angular';
+import { ModalController, Modal, Events } from 'ionic-angular';
 
 @Injectable()
 export class NiceHashService {
@@ -27,10 +27,11 @@ export class NiceHashService {
     currency: 'USD',
     silentMode: false,
     alertActive: false,
-    connectionError: false
+    connectionError: false,
+    darkTheme: false
   };
 
-  constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController, private zone: NgZone) {
+  constructor(public http: Http, private localNotifications: LocalNotifications, private insomnia: Insomnia, private modalCtrl: ModalController, private zone: NgZone, private events: Events) {
     this.readSettingsFromLocalStorage();
     this.startContinuousBalanceUpdate(false);
   }
@@ -162,6 +163,10 @@ export class NiceHashService {
       this.settings.currency = settings.currency;
     if (settings.silentMode !== undefined)
       this.settings.silentMode = settings.silentMode;
+    if(settings.darkTheme !== undefined)
+      this.settings.darkTheme = settings.darkTheme;
+    if(this.settings.darkTheme)
+      this.events.publish(AppConstants.APP_EVENTS.APP_THEME_UPDATE,{darkTheme:this.settings.darkTheme});
   }
 
   private parsePastProfitabilityData(data, pastTime) {
@@ -218,7 +223,8 @@ export class NiceHashService {
     let settings = {
       address: this.settings.address,
       currency: this.settings.currency,
-      silentMode: this.settings.silentMode
+      silentMode: this.settings.silentMode,
+      darkTheme: this.settings.darkTheme
     };
     window.localStorage.setItem(AppConstants.LOCALSTORAGE_KEYS.niceHashSettings, JSON.stringify(settings));
   }

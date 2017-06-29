@@ -5,6 +5,10 @@
       <ion-toggle [(ngModel)]="settings.silentMode" (ionChange)="updateSettings()"></ion-toggle>
     </ion-item>
     <ion-item>
+      <ion-label>Enable dark theme</ion-label>
+      <ion-toggle [(ngModel)]="settings.darkTheme" (ionChange)="toggleDarkTheme()"></ion-toggle>
+    </ion-item>
+    <ion-item>
       <ion-label>Display currency</ion-label>
       <ion-select [(ngModel)]="settings.currency" (ionChange)="updateSettings()">
         <ion-option *ngFor="let c of availableCurrencies" value="{{c}}">{{c}}</ion-option>

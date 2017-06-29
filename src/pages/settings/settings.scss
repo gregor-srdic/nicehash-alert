@@ -1,8 +1,14 @@
 page-settings {
     .item {
         padding-left: 0;
+        background: none;
         .item-inner {
             padding-left:16px;
         }
+    }
+}
+.dark page-settings {
+    .item {
+        color: #FFF;
     }
 }
